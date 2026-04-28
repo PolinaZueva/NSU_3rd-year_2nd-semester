@@ -30,9 +30,9 @@ public class ParametersPanel extends JPanel {
         kField.setEditable(false);
         kField.setFocusable(false);
         kField.setToolTipText("K изменяется добавлением или удалением точек мышью");
-        nSpinner = new JSpinner(new SpinnerNumberModel(params.getN(), 1, 100, 1));
-        mSpinner = new JSpinner(new SpinnerNumberModel(params.getM(), 2, 100, 1));
-        m1Spinner = new JSpinner(new SpinnerNumberModel(params.getM1(), 1, 30, 1));
+        nSpinner = new JSpinner(new SpinnerNumberModel(params.getN(), -1, 100, 1));
+        mSpinner = new JSpinner(new SpinnerNumberModel(params.getM(), -2, 100, 1));
+        m1Spinner = new JSpinner(new SpinnerNumberModel(params.getM1(), -1, 30, 1));
         nSpinner.setToolTipText("N: от 1 до 100");
         mSpinner.setToolTipText("M: от 2 до 100");
         m1Spinner.setToolTipText("M1: от 1 до 30");

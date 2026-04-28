@@ -83,7 +83,7 @@ public class App extends JFrame {
         editMenu.add(splineEditorItem);
 
         JMenu viewMenu = new JMenu("Вид");
-        JMenuItem resetViewItem = new JMenuItem("Сбросить поворот");
+        JMenuItem resetViewItem = new JMenuItem("Сбросить вид");
         resetViewItem.addActionListener(e -> resetView());
         viewMenu.add(resetViewItem);
 
@@ -116,8 +116,8 @@ public class App extends JFrame {
         editSplineButton.setToolTipText("Открыть редактор образующей");
         editSplineButton.addActionListener(e -> openSplineEditor());
 
-        JButton resetViewButton = new JButton("Сбросить поворот");
-        resetViewButton.setToolTipText("Сбросить углы поворота");
+        JButton resetViewButton = new JButton("Сбросить вид");
+        resetViewButton.setToolTipText("Сбросить поворот и масштаб");
         resetViewButton.addActionListener(e -> resetView());
 
         toolBar.add(editSplineButton);
@@ -182,6 +182,7 @@ public class App extends JFrame {
         scene.getSceneSettings().setRotX(0.0);
         scene.getSceneSettings().setRotY(0.0);
         scene.getSceneSettings().setRotZ(0.0);
+        scene.getSceneSettings().setZn(3.0);
         scenePanel.repaint();
     }
 

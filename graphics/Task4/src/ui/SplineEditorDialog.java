@@ -60,7 +60,11 @@ public class SplineEditorDialog extends JDialog {
 
             editorPanel.rebuildModel();
             editorPanel.repaint();
-            updateMainSceneIfNeeded();
+
+            if (parametersPanel.isAutoUpdateEnabled() && onApply != null) {
+                scene.rebuild();
+                onApply.run();
+            }
         });
 
         parametersPanel.addApplyAction(this::applyParameters);
@@ -75,6 +79,18 @@ public class SplineEditorDialog extends JDialog {
         if (!syncParametersFromControls()) {
             return;
         }
+
+        scene.rebuild();
+        editorPanel.rebuildModel();
+        editorPanel.repaint();
+
+        if (onApply != null) {
+            onApply.run();
+        }
+    }
+
+    private void rebuildAndRepaintEverything() {
+        scene.rebuild();
 
         editorPanel.rebuildModel();
         editorPanel.repaint();
@@ -119,6 +135,11 @@ public class SplineEditorDialog extends JDialog {
 
         scene.setControlPoints(defaultPoints);
 
+        scene.getSplineParameters().setK(defaultPoints.size());
+        scene.getSplineParameters().setN(10);
+        scene.getSplineParameters().setM(12);
+        scene.getSplineParameters().setM1(1);
+
         parametersPanel.setValues(
                 defaultPoints.size(),
                 10,
@@ -126,9 +147,7 @@ public class SplineEditorDialog extends JDialog {
                 1
         );
 
-        applyParameters();
-        refreshKSpinnerFromPoints();
-        editorPanel.repaint();
+        rebuildAndRepaintEverything();
     }
 
     private void saveInitialState() {
@@ -157,12 +176,7 @@ public class SplineEditorDialog extends JDialog {
                 initialParams.getM1()
         );
 
-        editorPanel.rebuildModel();
-        editorPanel.repaint();
-
-        if (onApply != null) {
-            onApply.run();
-        }
+        rebuildAndRepaintEverything();
     }
 
     private List<Point2D> copyPoints(List<Point2D> points) {
@@ -177,8 +191,7 @@ public class SplineEditorDialog extends JDialog {
 
     private void updateMainSceneIfNeeded() {
         if (parametersPanel != null && parametersPanel.isAutoUpdateEnabled()) {
-            editorPanel.rebuildModel();
-            editorPanel.repaint();
+            scene.rebuild();
 
             if (onApply != null) {
                 onApply.run();

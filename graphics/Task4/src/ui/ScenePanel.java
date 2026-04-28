@@ -4,13 +4,14 @@ import math.FigureBuilder;
 import math.Matrix4;
 import math.ModelTransformBuilder;
 import math.ProjectionUtils;
+import math.Bresenham;
+import model.PixelBuffer;
 import model.Point3D;
 import model.Scene;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-
 import java.awt.event.*;
 
 public class ScenePanel extends JPanel {
@@ -29,6 +30,7 @@ public class ScenePanel extends JPanel {
 
     public ScenePanel(Scene scene) {
         this.scene = scene;
+
         setBackground(Color.WHITE);
         setPreferredSize(new Dimension(800, 550));
         setMinimumSize(new Dimension(640, 480));
@@ -101,45 +103,41 @@ public class ScenePanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        PixelBuffer pbuffer = new PixelBuffer(getWidth(), getHeight());
+        drawFigure(pbuffer);
+
+        g.drawImage(pbuffer.getImage(), 0, 0, null);
+
         Graphics2D g2 = (Graphics2D) g.create();
-
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        drawFigure(g2);
         drawMiniAxes(g2);
-
         g2.dispose();
     }
 
-    private void drawFigure(Graphics2D g2) {
+    private void drawFigure(PixelBuffer pbuffer) {
         List<List<Point3D>> figure = scene.getFigurePoints();
 
         if (figure == null || figure.isEmpty()) {
-            g2.setColor(Color.BLACK);
-            g2.drawString("Фигура ещё не построена. Открой редактор и нажми Применить.", 20, 45);
             return;
         }
 
         Matrix4 transform = transformBuilder.buildTransform(figure, scene.getSceneSettings());
 
-        g2.setStroke(new BasicStroke(1.0f));
-
-        drawGenerators(g2, figure, transform);
-        drawRings(g2, figure, transform);
+        drawGenerators(pbuffer, figure, transform);
+        drawRings(pbuffer, figure, transform);
     }
 
-    private void drawGenerators(Graphics2D g2, List<List<Point3D>> figure, Matrix4 transform) {
+    private void drawGenerators(PixelBuffer pbuffer, List<List<Point3D>> figure, Matrix4 transform) {
         for (List<Point3D> generator : figure) {
             for (int i = 0; i < generator.size() - 1; i++) {
                 Point3D p1 = transform.transform(generator.get(i));
                 Point3D p2 = transform.transform(generator.get(i + 1));
 
-                drawProjectedLine(g2, p1, p2);
+                drawProjectedLine(pbuffer, p1, p2);
             }
         }
     }
 
-    private void drawRings(Graphics2D g2, List<List<Point3D>> figure, Matrix4 transform) {
+    private void drawRings(PixelBuffer pbuffer, List<List<Point3D>> figure, Matrix4 transform) {
         int m = figure.size();
         int pointsCount = figure.get(0).size();
 
@@ -147,18 +145,18 @@ public class ScenePanel extends JPanel {
         int m1 = scene.getSplineParameters().getM1();
 
         for (int i = 0; i < pointsCount; i += n) {
-            drawOneRing(g2, figure, transform, i, m, m1);
+            drawOneRing(pbuffer, figure, transform, i, m, m1);
         }
 
         int lastIndex = pointsCount - 1;
 
         if ((lastIndex % n) != 0) {
-            drawOneRing(g2, figure, transform, lastIndex, m, m1);
+            drawOneRing(pbuffer, figure, transform, lastIndex, m, m1);
         }
     }
 
     private void drawOneRing(
-            Graphics2D g2,
+            PixelBuffer pbuffer,
             List<List<Point3D>> figure,
             Matrix4 transform,
             int pointIndex,
@@ -169,12 +167,12 @@ public class ScenePanel extends JPanel {
             Point3D a = figure.get(j).get(pointIndex);
             Point3D b = figure.get((j + 1) % m).get(pointIndex);
 
-            drawSmoothRingPart(g2, transform, a, b, m1);
+            drawSmoothRingPart(pbuffer, transform, a, b, m1);
         }
     }
 
     private void drawSmoothRingPart(
-            Graphics2D g2,
+            PixelBuffer pbuffer,
             Matrix4 transform,
             Point3D a,
             Point3D b,
@@ -190,13 +188,13 @@ public class ScenePanel extends JPanel {
             Point3D p1 = transform.transform(previous);
             Point3D p2 = transform.transform(current);
 
-            drawProjectedLine(g2, p1, p2);
+            drawProjectedLine(pbuffer, p1, p2);
 
             previous = current;
         }
     }
 
-    private void drawProjectedLine(Graphics2D g2, Point3D p1, Point3D p2) {
+    private void drawProjectedLine(PixelBuffer pbuffer, Point3D p1, Point3D p2) {
         ProjectionUtils.ProjectedPoint a = ProjectionUtils.project(
                 p1,
                 scene.getCamera(),
@@ -218,9 +216,16 @@ public class ScenePanel extends JPanel {
         }
 
         double averageDepth = (a.getDepth() + b.getDepth()) / 2.0;
-        g2.setColor(ProjectionUtils.depthToColor(averageDepth));
+        int rgb = ProjectionUtils.depthToColor(averageDepth).getRGB();
 
-        g2.drawLine(a.getX(), a.getY(), b.getX(), b.getY());
+        Bresenham.drawLine(
+                a.getX(),
+                a.getY(),
+                b.getX(),
+                b.getY(),
+                rgb,
+                pbuffer
+        );
     }
 
     private void drawMiniAxes(Graphics2D g2) {
