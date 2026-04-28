@@ -46,12 +46,4 @@ public class SceneSettings {
     public void setZn(double Zn) {
         this.Zn = Zn;
     }
-
-    public boolean isShowAxis() {
-        return showAxis;
-    }
-
-    public void setShowAxis(boolean showAxis) {
-        this.showAxis = showAxis;
-    }
 }

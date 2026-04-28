@@ -5,6 +5,7 @@ import model.SplineParameters;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import javax.swing.text.NumberFormatter;
 
 public class ParametersPanel extends JPanel {
     private final JTextField kField;
@@ -17,6 +18,7 @@ public class ParametersPanel extends JPanel {
     private final JButton applyButton;
     private final JButton cancelButton;
     private final JButton defaultButton;
+    private final JButton normalizeButton;
     private final JButton closeButton;
 
     private boolean updatingFromCode = false;
@@ -30,23 +32,28 @@ public class ParametersPanel extends JPanel {
         kField.setEditable(false);
         kField.setFocusable(false);
         kField.setToolTipText("K изменяется добавлением или удалением точек мышью");
-        nSpinner = new JSpinner(new SpinnerNumberModel(params.getN(), -1, 100, 1));
-        mSpinner = new JSpinner(new SpinnerNumberModel(params.getM(), -2, 100, 1));
-        m1Spinner = new JSpinner(new SpinnerNumberModel(params.getM1(), -1, 30, 1));
+        nSpinner = new JSpinner(new SpinnerNumberModel(params.getN(), 1, 100, 1));
+        mSpinner = new JSpinner(new SpinnerNumberModel(params.getM(), 2, 100, 1));
+        m1Spinner = new JSpinner(new SpinnerNumberModel(params.getM1(), 1, 30, 1));
         nSpinner.setToolTipText("N: от 1 до 100");
         mSpinner.setToolTipText("M: от 2 до 100");
         m1Spinner.setToolTipText("M1: от 1 до 30");
+        configureSpinnerEditor(nSpinner);
+        configureSpinnerEditor(mSpinner);
+        configureSpinnerEditor(m1Spinner);
 
         autoUpdateCheckBox = new JCheckBox("Автообновление", true);
 
         applyButton = new JButton("Применить");
         cancelButton = new JButton("Отмена");
         defaultButton = new JButton("Стандарт");
+        normalizeButton = new JButton("Нормировать");
         closeButton = new JButton("Закрыть");
 
         applyButton.setToolTipText("Перестроить сцену без закрытия редактора");
         cancelButton.setToolTipText("Вернуть состояние на момент открытия редактора");
         defaultButton.setToolTipText("Вернуть стандартную образующую и параметры");
+        normalizeButton.setToolTipText("Автоматически вписать образующую в окно редактора");
         closeButton.setToolTipText("Закрыть редактор, оставив текущие изменения");
 
         buildLayout();
@@ -77,11 +84,13 @@ public class ParametersPanel extends JPanel {
         applyButton.setPreferredSize(buttonSize);
         cancelButton.setPreferredSize(buttonSize);
         defaultButton.setPreferredSize(buttonSize);
+        normalizeButton.setPreferredSize(buttonSize);
         closeButton.setPreferredSize(buttonSize);
 
         buttonsPanel.add(applyButton);
         buttonsPanel.add(cancelButton);
         buttonsPanel.add(defaultButton);
+        buttonsPanel.add(normalizeButton);
         buttonsPanel.add(closeButton);
 
         JPanel content = new JPanel();
@@ -145,6 +154,10 @@ public class ParametersPanel extends JPanel {
 
     public void addCancelAction(Runnable action) {
         cancelButton.addActionListener(e -> action.run());
+    }
+
+    public void addNormalizeAction(Runnable action) {
+        normalizeButton.addActionListener(e -> action.run());
     }
 
     public void addDefaultAction(Runnable action) {
@@ -218,5 +231,20 @@ public class ParametersPanel extends JPanel {
                 "Ошибка ввода",
                 JOptionPane.ERROR_MESSAGE
         );
+    }
+
+    private void configureSpinnerEditor(JSpinner spinner) {
+        JComponent editor = spinner.getEditor();
+
+        if (editor instanceof JSpinner.DefaultEditor defaultEditor) {
+            JFormattedTextField textField = defaultEditor.getTextField();
+
+            textField.setFocusLostBehavior(JFormattedTextField.PERSIST);
+
+            if (textField.getFormatter() instanceof NumberFormatter formatter) {
+                formatter.setAllowsInvalid(true);
+                formatter.setCommitsOnValidEdit(false);
+            }
+        }
     }
 }

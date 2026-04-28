@@ -11,12 +11,12 @@ public class Bresenham {
         int y = y1;
         int err;
 
-        /*
+
         if (dx == 0 && dy == 0) {
             pbuffer.drawPixel(x, y, rgb);
             return;
         }
-         */
+
 
         if (dx > 0 && dy >= 0 && dx >= dy) {  //1-ый октант
             err = 0;

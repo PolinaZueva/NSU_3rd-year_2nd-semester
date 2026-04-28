@@ -41,6 +41,8 @@ public class SplineEditorDialog extends JDialog {
 
         refreshKSpinnerFromPoints();
         saveInitialState();
+
+        SwingUtilities.invokeLater(editorPanel::normalizeView);
     }
 
     private JPanel createBottomPanel() {
@@ -62,7 +64,6 @@ public class SplineEditorDialog extends JDialog {
             editorPanel.repaint();
 
             if (parametersPanel.isAutoUpdateEnabled() && onApply != null) {
-                scene.rebuild();
                 onApply.run();
             }
         });
@@ -70,6 +71,7 @@ public class SplineEditorDialog extends JDialog {
         parametersPanel.addApplyAction(this::applyParameters);
         parametersPanel.addCancelAction(this::restoreInitialState);
         parametersPanel.addDefaultAction(this::setDefaultState);
+        parametersPanel.addNormalizeAction(editorPanel::normalizeView);
         parametersPanel.addCloseAction(this::dispose);
 
         return parametersPanel;
@@ -80,18 +82,10 @@ public class SplineEditorDialog extends JDialog {
             return;
         }
 
-        scene.rebuild();
-        editorPanel.rebuildModel();
-        editorPanel.repaint();
-
-        if (onApply != null) {
-            onApply.run();
-        }
+        rebuildAndRepaintEverything();
     }
 
     private void rebuildAndRepaintEverything() {
-        scene.rebuild();
-
         editorPanel.rebuildModel();
         editorPanel.repaint();
 
@@ -148,6 +142,7 @@ public class SplineEditorDialog extends JDialog {
         );
 
         rebuildAndRepaintEverything();
+        SwingUtilities.invokeLater(editorPanel::normalizeView);
     }
 
     private void saveInitialState() {
