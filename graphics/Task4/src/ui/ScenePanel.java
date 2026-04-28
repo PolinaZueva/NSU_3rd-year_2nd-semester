@@ -1,5 +1,6 @@
 package ui;
 
+import math.FigureBuilder;
 import math.Matrix4;
 import math.ModelTransformBuilder;
 import math.ProjectionUtils;
@@ -15,6 +16,7 @@ import java.awt.event.*;
 public class ScenePanel extends JPanel {
     private final Scene scene;
     private final ModelTransformBuilder transformBuilder = new ModelTransformBuilder();
+    private final FigureBuilder figureBuilder = new FigureBuilder();
 
     private int lastMouseX;
     private int lastMouseY;
@@ -126,48 +128,6 @@ public class ScenePanel extends JPanel {
         drawRings(g2, figure, transform);
     }
 
-    private void drawMiniAxes(Graphics2D g2) {
-        int originX = 70;
-        int originY = 75;
-        int axisLength = 35;
-
-        Matrix4 rotation = Matrix4.rotationZ(scene.getSceneSettings().getRotZ())
-                .multiply(Matrix4.rotationY(scene.getSceneSettings().getRotY()))
-                .multiply(Matrix4.rotationX(scene.getSceneSettings().getRotX()));
-
-        Point3D origin = new Point3D(0, 0, 0);
-
-        Point3D xAxis = rotation.transform(new Point3D(1, 0, 0));
-        Point3D yAxis = rotation.transform(new Point3D(0, 1, 0));
-        Point3D zAxis = rotation.transform(new Point3D(0, 0, 1));
-
-        drawMiniAxis(g2, origin, xAxis, originX, originY, axisLength, Color.RED, "X");
-        drawMiniAxis(g2, origin, yAxis, originX, originY, axisLength, Color.GREEN, "Y");
-        drawMiniAxis(g2, origin, zAxis, originX, originY, axisLength, Color.BLUE, "Z");
-    }
-
-    private void drawMiniAxis(Graphics2D g2, Point3D origin, Point3D axis,
-                                int originX, int originY, int axisLength, Color color, String label) {
-        Point p1 = miniProject(origin, originX, originY, axisLength);
-        Point p2 = miniProject(axis, originX, originY, axisLength);
-
-        g2.setColor(color);
-        g2.setStroke(new BasicStroke(2.0f));
-
-        g2.drawLine(p1.x, p1.y, p2.x, p2.y);
-        g2.drawString(label, p2.x + 4, p2.y - 4);
-    }
-
-    private Point miniProject(Point3D p, int originX, int originY, int axisLength) {
-        double screenX = p.getY() - 0.5 * p.getX();
-        double screenY = p.getZ() - 0.5 * p.getX();
-
-        int x = originX + (int) Math.round(screenX * axisLength);
-        int y = originY - (int) Math.round(screenY * axisLength);
-
-        return new Point(x, y);
-    }
-
     private void drawGenerators(Graphics2D g2, List<List<Point3D>> figure, Matrix4 transform) {
         for (List<Point3D> generator : figure) {
             for (int i = 0; i < generator.size() - 1; i++) {
@@ -225,7 +185,7 @@ public class ScenePanel extends JPanel {
         for (int s = 1; s <= m1; s++) {
             double t = s / (double) m1;
 
-            Point3D current = interpolateOnCircle(a, b, t);
+            Point3D current = figureBuilder.interpolateOnCircle(a, b, t);
 
             Point3D p1 = transform.transform(previous);
             Point3D p2 = transform.transform(current);
@@ -234,26 +194,6 @@ public class ScenePanel extends JPanel {
 
             previous = current;
         }
-    }
-
-    private Point3D interpolateOnCircle(Point3D a, Point3D b, double t) {
-        double angleA = Math.atan2(a.getY(), a.getX());
-        double angleB = Math.atan2(b.getY(), b.getX());
-
-        double delta = angleB - angleA;
-
-        if (delta < 0) {
-            delta += 2.0 * Math.PI;
-        }
-
-        double angle = angleA + delta * t;
-
-        double radius = Math.sqrt(a.getX() * a.getX() + a.getY() * a.getY());
-
-        double x = radius * Math.cos(angle);
-        double y = radius * Math.sin(angle);
-
-        return new Point3D(x, y, a.getZ());
     }
 
     private void drawProjectedLine(Graphics2D g2, Point3D p1, Point3D p2) {
@@ -281,5 +221,47 @@ public class ScenePanel extends JPanel {
         g2.setColor(ProjectionUtils.depthToColor(averageDepth));
 
         g2.drawLine(a.getX(), a.getY(), b.getX(), b.getY());
+    }
+
+    private void drawMiniAxes(Graphics2D g2) {
+        int originX = 70;
+        int originY = 75;
+        int axisLength = 35;
+
+        Matrix4 rotation = Matrix4.rotationZ(scene.getSceneSettings().getRotZ())
+                .multiply(Matrix4.rotationY(scene.getSceneSettings().getRotY()))
+                .multiply(Matrix4.rotationX(scene.getSceneSettings().getRotX()));
+
+        Point3D origin = new Point3D(0, 0, 0);
+
+        Point3D xAxis = rotation.transform(new Point3D(1, 0, 0));
+        Point3D yAxis = rotation.transform(new Point3D(0, 1, 0));
+        Point3D zAxis = rotation.transform(new Point3D(0, 0, 1));
+
+        drawMiniAxis(g2, origin, xAxis, originX, originY, axisLength, Color.RED, "X");
+        drawMiniAxis(g2, origin, yAxis, originX, originY, axisLength, Color.GREEN, "Y");
+        drawMiniAxis(g2, origin, zAxis, originX, originY, axisLength, Color.BLUE, "Z");
+    }
+
+    private void drawMiniAxis(Graphics2D g2, Point3D origin, Point3D axis,
+                              int originX, int originY, int axisLength, Color color, String label) {
+        Point p1 = miniProject(origin, originX, originY, axisLength);
+        Point p2 = miniProject(axis, originX, originY, axisLength);
+
+        g2.setColor(color);
+        g2.setStroke(new BasicStroke(2.0f));
+
+        g2.drawLine(p1.x, p1.y, p2.x, p2.y);
+        g2.drawString(label, p2.x + 4, p2.y - 4);
+    }
+
+    private Point miniProject(Point3D p, int originX, int originY, int axisLength) {
+        double screenX = p.getY() - 0.5 * p.getX();
+        double screenY = p.getZ() - 0.5 * p.getX();
+
+        int x = originX + (int) Math.round(screenX * axisLength);
+        int y = originY - (int) Math.round(screenY * axisLength);
+
+        return new Point(x, y);
     }
 }

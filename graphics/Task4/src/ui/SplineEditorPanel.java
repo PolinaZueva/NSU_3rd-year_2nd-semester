@@ -2,8 +2,6 @@ package ui;
 
 import model.Point2D;
 import model.Scene;
-import math.BSplineBuilder;
-import math.FigureBuilder;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,8 +11,6 @@ import java.util.List;
 public class SplineEditorPanel extends JPanel {
     private final Scene scene;
     private final Runnable onPointsChanged;
-    private final BSplineBuilder splineBuilder = new BSplineBuilder();
-    private final FigureBuilder figureBuilder = new FigureBuilder();
 
     private static final int GRID_STEP = 40;
     private static final int POINT_RADIUS = 7;
@@ -60,113 +56,10 @@ public class SplineEditorPanel extends JPanel {
         drawGrid(g2);
         drawAxes(g2);
         drawControlPolyline(g2);
-        rebuildModel();
         drawSpline(g2);
         drawControlPoints(g2);
 
         g2.dispose();
-    }
-
-    private void handleMousePressed(MouseEvent e) {
-        int index = findPointAt(e.getX(), e.getY());
-
-        if (SwingUtilities.isLeftMouseButton(e)) {
-            selectedPointIndex = index;
-        }
-
-        if (SwingUtilities.isRightMouseButton(e)) {
-            if (index >= 0) {
-                removePoint(index);
-            } else {
-                addPoint(e.getX(), e.getY());
-            }
-
-            if (onPointsChanged != null) {
-                onPointsChanged.run();
-            }
-        }
-
-        repaint();
-    }
-
-    private void handleMouseDragged(MouseEvent e) {
-        if (selectedPointIndex < 0) {
-            return;
-        }
-
-        Point2D newPoint = screenToWorldClamped(e.getX(), e.getY());
-        scene.getControlPoints().get(selectedPointIndex).setU(newPoint.getU());
-        scene.getControlPoints().get(selectedPointIndex).setV(newPoint.getV());
-
-        repaint();
-    }
-
-    public void rebuildModel() {
-        int n = scene.getSplineParameters().getN();
-        int m = scene.getSplineParameters().getM();
-
-        scene.setSplinePoints(
-                splineBuilder.buildSpline(scene.getControlPoints(), n)
-        );
-
-        scene.setFigurePoints(
-                figureBuilder.buildFigure(scene.getSplinePoints(), m)
-        );
-    }
-
-    private void drawSpline(Graphics2D g2) {
-        List<Point2D> points = scene.getSplinePoints();
-
-        if (points == null || points.size() < 2) {
-            return;
-        }
-
-        g2.setColor(new Color(230, 210, 40));
-        g2.setStroke(new BasicStroke(2.0f));
-
-        for (int i = 0; i < points.size() - 1; i++) {
-            Point p1 = worldToScreen(points.get(i));
-            Point p2 = worldToScreen(points.get(i + 1));
-
-            g2.drawLine(p1.x, p1.y, p2.x, p2.y);
-        }
-    }
-
-    private int findPointAt(int mouseX, int mouseY) {
-        List<Point2D> points = scene.getControlPoints();
-
-        for (int i = 0; i < points.size(); i++) {
-            Point screen = worldToScreen(points.get(i));
-
-            double dx = mouseX - screen.x;
-            double dy = mouseY - screen.y;
-            double distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance <= HIT_RADIUS) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    private void addPoint(int screenX, int screenY) {
-        Point2D point = screenToWorldClamped(screenX, screenY);
-        scene.getControlPoints().add(point);
-    }
-
-    private void removePoint(int index) {
-        if (scene.getControlPoints().size() <= 4) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Нельзя удалить точку: для B-сплайна нужно минимум 4 опорные точки.",
-                    "Ошибка",
-                    JOptionPane.WARNING_MESSAGE
-            );
-            return;
-        }
-
-        scene.getControlPoints().remove(index);
     }
 
     private void drawGrid(Graphics2D g2) {
@@ -251,6 +144,24 @@ public class SplineEditorPanel extends JPanel {
         }
     }
 
+    private void drawSpline(Graphics2D g2) {
+        List<Point2D> points = scene.getSplinePoints();
+
+        if (points == null || points.size() < 2) {
+            return;
+        }
+
+        g2.setColor(new Color(230, 210, 40));
+        g2.setStroke(new BasicStroke(2.0f));
+
+        for (int i = 0; i < points.size() - 1; i++) {
+            Point p1 = worldToScreen(points.get(i));
+            Point p2 = worldToScreen(points.get(i + 1));
+
+            g2.drawLine(p1.x, p1.y, p2.x, p2.y);
+        }
+    }
+
     private void drawControlPoints(Graphics2D g2) {
         List<Point2D> points = scene.getControlPoints();
 
@@ -296,6 +207,83 @@ public class SplineEditorPanel extends JPanel {
         }
     }
 
+    private void handleMousePressed(MouseEvent e) {
+        int index = findPointAt(e.getX(), e.getY());
+
+        if (SwingUtilities.isLeftMouseButton(e)) {
+            selectedPointIndex = index;
+        }
+
+        if (SwingUtilities.isRightMouseButton(e)) {
+            if (index >= 0) {
+                removePoint(index);
+            } else {
+                addPoint(e.getX(), e.getY());
+            }
+
+            rebuildModel();
+
+            if (onPointsChanged != null) {
+                onPointsChanged.run();
+            }
+        }
+
+        repaint();
+    }
+
+    private void handleMouseDragged(MouseEvent e) {
+        if (selectedPointIndex < 0) {
+            return;
+        }
+
+        Point2D newPoint = screenToWorldClamped(e.getX(), e.getY());
+        scene.getControlPoints().get(selectedPointIndex).setU(newPoint.getU());
+        scene.getControlPoints().get(selectedPointIndex).setV(newPoint.getV());
+
+        rebuildModel();
+        if (onPointsChanged != null) {
+            onPointsChanged.run();
+        }
+        repaint();
+    }
+
+    private int findPointAt(int mouseX, int mouseY) {
+        List<Point2D> points = scene.getControlPoints();
+
+        for (int i = 0; i < points.size(); i++) {
+            Point screen = worldToScreen(points.get(i));
+
+            double dx = mouseX - screen.x;
+            double dy = mouseY - screen.y;
+            double distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance <= HIT_RADIUS) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private void addPoint(int screenX, int screenY) {
+        Point2D point = screenToWorldClamped(screenX, screenY);
+        scene.getControlPoints().add(point);
+    }
+
+    private void removePoint(int index) {
+        if (scene.getControlPoints().size() <= 4) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Нельзя удалить точку: для B-сплайна нужно минимум 4 опорные точки.",
+                    "Ошибка",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        scene.getControlPoints().remove(index);
+    }
+
     private Point worldToScreen(Point2D point) {
         int x = getCenterX() + (int) Math.round(point.getU() * GRID_STEP);
         int y = getCenterY() - (int) Math.round(point.getV() * GRID_STEP);
@@ -310,10 +298,6 @@ public class SplineEditorPanel extends JPanel {
         return new Point2D(u, v);
     }
 
-    private int clamp(int value, int min, int max) {
-        return Math.max(min, Math.min(max, value));
-    }
-
     private Point2D screenToWorldClamped(int x, int y) {
         int margin = POINT_RADIUS + 2;
 
@@ -323,11 +307,20 @@ public class SplineEditorPanel extends JPanel {
         return screenToWorld(clampedX, clampedY);
     }
 
+    private int clamp(int value, int min, int max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+
     private int getCenterX() {
         return getWidth() / 2;
     }
 
     private int getCenterY() {
         return getHeight() / 2;
+    }
+
+    public void rebuildModel() {
+        scene.rebuild();
     }
 }

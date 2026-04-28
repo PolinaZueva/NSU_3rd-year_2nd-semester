@@ -40,4 +40,24 @@ public class FigureBuilder {
         }
         return figure;
     }
+
+    public Point3D interpolateOnCircle(Point3D a, Point3D b, double t) {
+        double angleA = Math.atan2(a.getY(), a.getX());
+        double angleB = Math.atan2(b.getY(), b.getX());
+
+        double delta = angleB - angleA;
+
+        if (delta < 0) {
+            delta += 2.0 * Math.PI;
+        }
+
+        double angle = angleA + delta * t;
+
+        double radius = Math.sqrt(a.getX() * a.getX() + a.getY() * a.getY());
+
+        double x = radius * Math.cos(angle);
+        double y = radius * Math.sin(angle);
+
+        return new Point3D(x, y, a.getZ());
+    }
 }

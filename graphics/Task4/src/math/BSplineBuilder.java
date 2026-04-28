@@ -9,7 +9,7 @@ public class BSplineBuilder {
     public List<Point2D> buildSpline(List<Point2D> controlPoints, int n) {
         List<Point2D> splinePoints = new ArrayList<>();
 
-        if (controlPoints.isEmpty() || controlPoints.size() < 4) {
+        if (controlPoints == null || controlPoints.size() < 4) {
             return splinePoints;
         }
 

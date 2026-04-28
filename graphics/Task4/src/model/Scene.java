@@ -3,6 +3,9 @@ package model;
 import java.util.List;
 import java.util.ArrayList;
 
+import math.BSplineBuilder;
+import math.FigureBuilder;
+
 public class Scene {
     private List<Point2D> controlPoints;
     private List<Point2D> splinePoints;
@@ -73,5 +76,20 @@ public class Scene {
         points.add(new Point2D(2.6, 2.5));
 
         return points;
+    }
+
+    public void rebuild() {
+        BSplineBuilder splineBuilder = new BSplineBuilder();
+        FigureBuilder figureBuilder = new FigureBuilder();
+
+        this.splinePoints = splineBuilder.buildSpline(
+                controlPoints,
+                splineParameters.getN()
+        );
+
+        this.figurePoints = figureBuilder.buildFigure(
+                splinePoints,
+                splineParameters.getM()
+        );
     }
 }

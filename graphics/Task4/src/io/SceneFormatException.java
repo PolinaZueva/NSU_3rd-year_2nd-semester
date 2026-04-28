@@ -1,4 +1,7 @@
 package io;
 
-public class SceneFormatException {
+public class SceneFormatException extends Exception {
+    public SceneFormatException(String message) {
+        super(message);
+    }
 }
