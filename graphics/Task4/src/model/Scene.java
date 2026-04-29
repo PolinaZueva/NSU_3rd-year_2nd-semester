@@ -78,7 +78,7 @@ public class Scene {
         return points;
     }
 
-    public void rebuild() {
+    public void rebuild() {  //пересобирает всю сцену
         BSplineBuilder splineBuilder = new BSplineBuilder();
         FigureBuilder figureBuilder = new FigureBuilder();
 

@@ -19,6 +19,7 @@ import java.util.List;
 public class App extends JFrame {
     private final Scene scene;
     private final ScenePanel scenePanel;
+    private SplineEditorDialog splineEditorDialog;
 
     public App() {
         super("ICGApp");
@@ -128,15 +129,21 @@ public class App extends JFrame {
     }
 
     private void openSplineEditor() {
-        SplineEditorDialog dialog = new SplineEditorDialog(
+        if (splineEditorDialog != null && splineEditorDialog.isDisplayable()) {
+            splineEditorDialog.toFront();
+            splineEditorDialog.requestFocus();
+            return;
+        }
+
+        splineEditorDialog = new SplineEditorDialog(
                 this,
                 scene,
                 () -> scenePanel.repaint()
         );
 
-        arrangeWindowsForEditor(dialog);
+        arrangeWindowsForEditor(splineEditorDialog);
 
-        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+        splineEditorDialog.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosed(java.awt.event.WindowEvent e) {
                 restoreMainWindowAfterEditor();
@@ -148,8 +155,7 @@ public class App extends JFrame {
             }
         });
 
-
-        dialog.setVisible(true);
+        splineEditorDialog.setVisible(true);
     }
 
     private void arrangeWindowsForEditor(SplineEditorDialog dialog) {

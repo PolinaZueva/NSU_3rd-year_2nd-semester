@@ -9,13 +9,8 @@ public class BSplineBuilder {
     public List<Point2D> buildSpline(List<Point2D> controlPoints, int n) {
         List<Point2D> splinePoints = new ArrayList<>();
 
-        if (controlPoints == null || controlPoints.size() < 4) {
-            return splinePoints;
-        }
-
-        if (n < 1) {
-            n = 1;
-        }
+        if (controlPoints == null || controlPoints.size() < 4) return splinePoints;
+        if (n < 1) n = 1;
 
         int k = controlPoints.size();
         for (int i = 0; i <= k - 4; i++) {
@@ -25,7 +20,6 @@ public class BSplineBuilder {
             Point2D p3 = controlPoints.get(i + 3);
 
             int startJ = (i == 0) ? 0 : 1;
-
             for (int j = startJ; j <= n; j++) {
                 double t = j / (double) n;
                 splinePoints.add(evaluate(p0, p1, p2, p3, t));

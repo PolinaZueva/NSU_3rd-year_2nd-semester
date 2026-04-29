@@ -25,7 +25,7 @@ public class SplineEditorDialog extends JDialog {
         this.scene = scene;
         this.onApply = onApply;
 
-        syncKFromRealPoints();
+        updateKFromControlPoints();
 
         this.editorPanel = new SplineEditorPanel(scene, this::onEditorPointsChanged);
 
@@ -39,7 +39,7 @@ public class SplineEditorDialog extends JDialog {
         setSize(800, 600);
         setLocationRelativeTo(owner);
 
-        refreshKSpinnerFromPoints();
+        updateKFromControlPoints();
         saveInitialState();
 
         SwingUtilities.invokeLater(editorPanel::normalizeView);
@@ -99,7 +99,7 @@ public class SplineEditorDialog extends JDialog {
             return false;
         }
 
-        syncKFromRealPoints();
+        updateKFromControlPoints();
 
         scene.getSplineParameters().setN(parametersPanel.getNValue());
         scene.getSplineParameters().setM(parametersPanel.getMValue());
@@ -109,19 +109,18 @@ public class SplineEditorDialog extends JDialog {
     }
 
     private void onEditorPointsChanged() {
-        refreshKSpinnerFromPoints();
+        updateKFromControlPoints();
         updateMainSceneIfNeeded();
     }
 
-    private void refreshKSpinnerFromPoints() {
+    private void updateKFromControlPoints() {
         int realK = scene.getControlPoints().size();
 
-        parametersPanel.setKValue(realK);
         scene.getSplineParameters().setK(realK);
-    }
 
-    private void syncKFromRealPoints() {
-        scene.getSplineParameters().setK(scene.getControlPoints().size());
+        if (parametersPanel != null) {
+            parametersPanel.setKValue(realK);
+        }
     }
 
     private void setDefaultState() {

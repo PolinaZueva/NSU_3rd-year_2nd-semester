@@ -1,18 +1,17 @@
 package model;
 
+//настройки отображения
 public class SceneSettings {
     private double rotX;
     private double rotY;
     private double rotZ;
     private double Zn;
-    private boolean showAxis;
 
     public SceneSettings(double rotX, double rotY, double rotZ, double Zn, boolean showAxis) {
         this.rotX = rotX;
         this.rotY = rotY;
         this.rotZ = rotZ;
         this.Zn = Zn;
-        this.showAxis = showAxis;
     }
 
     public double getRotX() {

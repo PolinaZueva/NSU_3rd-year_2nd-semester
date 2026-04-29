@@ -29,6 +29,7 @@ public class ParametersPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
 
         kField = new JTextField(String.valueOf(realK), 3);
+        kField.setPreferredSize(new Dimension(70, 24));
         kField.setEditable(false);
         kField.setFocusable(false);
         kField.setToolTipText("K изменяется добавлением или удалением точек мышью");
@@ -170,13 +171,7 @@ public class ParametersPanel extends JPanel {
                 && commitSpinnerOrShowError(m1Spinner, "M1", 1, 30, parent);
     }
 
-    private boolean commitSpinnerOrShowError(
-            JSpinner spinner,
-            String name,
-            int min,
-            int max,
-            Component parent
-    ) {
+    private boolean commitSpinnerOrShowError(JSpinner spinner, String name, int min, int max, Component parent) {
         int previousValue = (Integer) spinner.getValue();
         String text = getSpinnerText(spinner);
 
@@ -234,11 +229,16 @@ public class ParametersPanel extends JPanel {
     }
 
     private void configureSpinnerEditor(JSpinner spinner) {
+        spinner.setPreferredSize(new Dimension(70, 24));
+        spinner.setMinimumSize(new Dimension(70, 24));
+
         JComponent editor = spinner.getEditor();
 
         if (editor instanceof JSpinner.DefaultEditor defaultEditor) {
             JFormattedTextField textField = defaultEditor.getTextField();
 
+            textField.setColumns(4);
+            textField.setHorizontalAlignment(JTextField.RIGHT);
             textField.setFocusLostBehavior(JFormattedTextField.PERSIST);
 
             if (textField.getFormatter() instanceof NumberFormatter formatter) {

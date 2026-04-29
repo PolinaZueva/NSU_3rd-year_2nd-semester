@@ -11,7 +11,7 @@ public class SceneReader {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String header = readRequiredLine(reader, "Ожидался заголовок файла");
 
-            if (!header.equals("ICG_WIREFRAME_SCENE 1")) {
+            if (!header.equals("ICG_WIREFRAME_SCENE 1") && !header.equals("ICG_APP 1")) {
                 throw new SceneFormatException("Некорректный заголовок файла сцены.");
             }
 
@@ -90,7 +90,6 @@ public class SceneReader {
         if (line == null) {
             throw new SceneFormatException(errorMessage);
         }
-
         return line.trim();
     }
 
@@ -118,15 +117,12 @@ public class SceneReader {
         if (k < 4) {
             throw new SceneFormatException("K должен быть >= 4.");
         }
-
         if (n < 1) {
             throw new SceneFormatException("N должен быть >= 1.");
         }
-
         if (m < 2) {
             throw new SceneFormatException("M должен быть >= 2.");
         }
-
         if (m1 < 1) {
             throw new SceneFormatException("M1 должен быть >= 1.");
         }

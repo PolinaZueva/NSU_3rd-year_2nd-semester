@@ -5,10 +5,10 @@ import model.SceneSettings;
 
 import java.util.List;
 
+//общая матрица преобразования модели
 public class ModelTransformBuilder {
-
     public Matrix4 buildTransform(List<List<Point3D>> figure, SceneSettings settings) {
-        Bounds bounds = calculateBounds(figure);
+        Bounds bounds = calculateBounds(figure);  //минимальный и максимальный размер фигуры по каждой оси
 
         double centerX = (bounds.minX + bounds.maxX) / 2.0;
         double centerY = (bounds.minY + bounds.maxY) / 2.0;
@@ -20,11 +20,9 @@ public class ModelTransformBuilder {
 
         double maxSize = Math.max(sizeX, Math.max(sizeY, sizeZ));
 
-        if (maxSize == 0.0) {
-            maxSize = 1.0;
-        }
+        if (maxSize == 0.0) maxSize = 1.0;
 
-        double scale = 2.0 / maxSize;
+        double scale = 2.0 / maxSize;  //коэффициент масштаба
 
         Matrix4 moveToCenter = Matrix4.translation(-centerX, -centerY, -centerZ);
         Matrix4 normalize = Matrix4.scale(scale);
@@ -33,11 +31,7 @@ public class ModelTransformBuilder {
         Matrix4 rotateY = Matrix4.rotationY(settings.getRotY());
         Matrix4 rotateZ = Matrix4.rotationZ(settings.getRotZ());
 
-        return rotateZ
-                .multiply(rotateY)
-                .multiply(rotateX)
-                .multiply(normalize)
-                .multiply(moveToCenter);
+        return rotateZ.multiply(rotateY).multiply(rotateX).multiply(normalize).multiply(moveToCenter);
     }
 
     private Bounds calculateBounds(List<List<Point3D>> figure) {
@@ -48,7 +42,6 @@ public class ModelTransformBuilder {
                 bounds.include(p);
             }
         }
-
         return bounds;
     }
 

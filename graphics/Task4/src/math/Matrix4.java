@@ -5,20 +5,18 @@ import model.Point3D;
 public class Matrix4 {
     private final double[][] m = new double[4][4];
 
-    public Matrix4() {
-    }
+    public Matrix4() {}
 
-    public static Matrix4 identity() {
+    public static Matrix4 identity() {  //единичная матрица
         Matrix4 matrix = new Matrix4();
 
         for (int i = 0; i < 4; i++) {
             matrix.m[i][i] = 1.0;
         }
-
         return matrix;
     }
 
-    public static Matrix4 translation(double dx, double dy, double dz) {
+    public static Matrix4 translation(double dx, double dy, double dz) {  //матрица переноса точки
         Matrix4 matrix = identity();
 
         matrix.m[0][3] = dx;
@@ -28,7 +26,7 @@ public class Matrix4 {
         return matrix;
     }
 
-    public static Matrix4 scale(double s) {
+    public static Matrix4 scale(double s) {  //матрица масштаба
         Matrix4 matrix = identity();
 
         matrix.m[0][0] = s;
@@ -38,6 +36,7 @@ public class Matrix4 {
         return matrix;
     }
 
+    //при повороте вокруг X координата x не меняется, меняются только y и z
     public static Matrix4 rotationX(double angleDegrees) {
         Matrix4 matrix = identity();
 
@@ -102,13 +101,7 @@ public class Matrix4 {
     }
 
     public Point3D transform(Point3D p) {
-        double[] v = {
-                p.getX(),
-                p.getY(),
-                p.getZ(),
-                1.0
-        };
-
+        double[] v = {p.getX(), p.getY(), p.getZ(), 1.0};
         double[] r = new double[4];
 
         for (int row = 0; row < 4; row++) {
@@ -116,7 +109,6 @@ public class Matrix4 {
                 r[row] += m[row][k] * v[k];
             }
         }
-
         return new Point3D(r[0], r[1], r[2]);
     }
 }

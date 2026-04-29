@@ -12,7 +12,7 @@ import java.util.Locale;
 public class SceneWriter {
     public void write(Scene scene, File file) throws IOException {
         try (PrintWriter out = new PrintWriter(new FileWriter(file))) {
-            out.println("ICG_WIREFRAME_SCENE 1");
+            out.println("ICG_APP 1");
 
             out.printf(
                     Locale.US,
