@@ -61,12 +61,12 @@ public class ScenePanel extends JPanel {
                 int dx = e.getX() - lastMouseX;
                 int dy = e.getY() - lastMouseY;
 
-                scene.getSceneSettings().setRotY(
-                        scene.getSceneSettings().getRotY() + dx * ROTATION_SPEED
+                scene.getSceneSettings().setRotZ(
+                        scene.getSceneSettings().getRotZ() + dx * ROTATION_SPEED
                 );
 
-                scene.getSceneSettings().setRotX(
-                        scene.getSceneSettings().getRotX() + dy * ROTATION_SPEED
+                scene.getSceneSettings().setRotY(
+                        scene.getSceneSettings().getRotY() - dy * ROTATION_SPEED
                 );
 
                 lastMouseX = e.getX();

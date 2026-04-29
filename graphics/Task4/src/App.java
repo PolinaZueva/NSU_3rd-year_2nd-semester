@@ -94,8 +94,26 @@ public class App extends JFrame {
                 this,
                 "ICGApp\n\n" +
                         "Автор: Полина Зуева, группа 23206\n\n" +
-                        "Редактор образующей B-сплайна и отображение\n" +
-                        "проволочной фигуры вращения.",
+                        "Приложение предназначено для построения и визуализации\n" +
+                        "проволочной 3D-фигуры вращения на основе образующей,\n" +
+                        "заданной B-сплайном.\n\n" +
+
+                        "Функциональность:\n" +
+                        "- Редактирование опорных точек образующей (добавление, перемещение, удаление)\n" +
+                        "- Построение гладкой кривой B-сплайна\n" +
+                        "- Формирование тела вращения вокруг оси\n" +
+                        "- Перспективная проекция 3D-сцены\n" +
+                        "- Вращение сцены с помощью мыши\n" +
+                        "- Масштабирование (zoom)\n" +
+                        "- Визуализация глубины с помощью цвета\n\n" +
+
+                        "Параметры:\n" +
+                        "K - число опорных точек\n" +
+                        "N - детализация сплайна\n" +
+                        "M - число образующих\n" +
+                        "M1 - детализация окружностей\n\n" +
+
+                        "Отрисовка линий выполняется алгоритмом Брезенхема.",
                 "О программе",
                 JOptionPane.INFORMATION_MESSAGE
         ));
@@ -164,9 +182,9 @@ public class App extends JFrame {
         int margin = 30;
         int gap = 10;
 
-        int editorWidth = Math.min(760, (screen.width - 2 * margin - gap) / 2);
-        int mainWidth = Math.min(760, (screen.width - 2 * margin - gap) / 2);
-        int height = Math.min(650, screen.height - 2 * margin);
+        int editorWidth = Math.min(860, (screen.width - 2 * margin - gap) / 2);
+        int mainWidth = Math.min(860, (screen.width - 2 * margin - gap) / 2);
+        int height = Math.min(750, screen.height - 2 * margin);
 
         int totalWidth = editorWidth + gap + mainWidth;
         int startX = (screen.width - totalWidth) / 2;

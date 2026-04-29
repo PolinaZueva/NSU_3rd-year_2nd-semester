@@ -31,6 +31,7 @@ public class ModelTransformBuilder {
         Matrix4 rotateY = Matrix4.rotationY(settings.getRotY());
         Matrix4 rotateZ = Matrix4.rotationZ(settings.getRotZ());
 
+        //M = Rz · Ry · Rx · S · T
         return rotateZ.multiply(rotateY).multiply(rotateX).multiply(normalize).multiply(moveToCenter);
     }
 

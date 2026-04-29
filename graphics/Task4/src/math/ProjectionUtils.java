@@ -24,13 +24,13 @@ public class ProjectionUtils {
     }
 
     public static Color depthToColor(double depth) {
-        double minDepth = 9.0;
-        double maxDepth = 11.0;
+        double minDepth = 8.0;
+        double maxDepth = 12.0;
 
         double t = (depth - minDepth) / (maxDepth - minDepth);
         t = Math.max(0.0, Math.min(1.0, t));
 
-        int value = (int) Math.round(40 + 170 * (1.0 - t));  //серый цвет
+        int value = (int) Math.round(30 + 190 * t);
 
         return new Color(value, value, value);
     }

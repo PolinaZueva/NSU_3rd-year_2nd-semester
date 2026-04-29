@@ -25,7 +25,7 @@ public class SplineEditorPanel extends JPanel {
     private double offsetX = 0.0;
     private double offsetY = 0.0;
 
-    private boolean panning = false;
+    private boolean panning = false;  //двигает или нет
     private int lastPanX;
     private int lastPanY;
 
@@ -50,14 +50,14 @@ public class SplineEditorPanel extends JPanel {
             }
         });
 
-        addMouseMotionListener(new MouseMotionAdapter() {
+        addMouseMotionListener(new MouseMotionAdapter() {  //обработка перетаскивания
             @Override
-            public void mouseDragged(MouseEvent e) {
+            public void mouseDragged(MouseEvent e) {  //если мышь двигается с зажатой кнопкой
                 handleMouseDragged(e);
             }
         });
 
-        addMouseWheelListener(this::handleMouseWheel);
+        addMouseWheelListener(this::handleMouseWheel);  //обработчик колеса мыши
     }
 
     @Override
@@ -67,13 +67,13 @@ public class SplineEditorPanel extends JPanel {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        drawGrid(g2);
-        drawAxes(g2);
-        drawControlPolyline(g2);
-        drawSpline(g2);
-        drawControlPoints(g2);
+        drawGrid(g2);  //сетка
+        drawAxes(g2);  //оси
+        drawControlPolyline(g2);  //ломанная по опорным точкам
+        drawSpline(g2);  //сам сплайн
+        drawControlPoints(g2);  //опорные точки
 
-        g2.dispose();
+        g2.dispose();  //освобождаем
     }
 
     private void handleMousePressed(MouseEvent e) {
@@ -103,7 +103,6 @@ public class SplineEditorPanel extends JPanel {
                 onPointsChanged.run();
             }
         }
-
         repaint();
     }
 
@@ -162,7 +161,7 @@ public class SplineEditorPanel extends JPanel {
         repaint();
     }
 
-    public void normalizeView() {
+    public void normalizeView() {  //вписывает все опорные точки в окно редактора
         List<Point2D> points = scene.getControlPoints();
 
         if (points == null || points.isEmpty()) {
@@ -373,7 +372,7 @@ public class SplineEditorPanel extends JPanel {
         scene.getControlPoints().remove(index);
     }
 
-    private Point worldToScreen(Point2D point) {
+    private Point worldToScreen(Point2D point) {  //переводит точку из координат U,V в пиксели экрана
         int x = (int) Math.round(getWidth() / 2.0 + offsetX + point.getU() * scale);
         int y = (int) Math.round(getHeight() / 2.0 + offsetY - point.getV() * scale);
 

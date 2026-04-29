@@ -36,7 +36,7 @@ public class FigureBuilder {
         return figure;
     }
 
-    //строит промежуточную точку между двумя соседними образующими по окружности и сглаживает окружность между образующими
+    //строит промежуточную точку между двумя соседними образующими по дуге окружности
     public Point3D interpolateOnCircle(Point3D a, Point3D b, double t) {
         double angleA = Math.atan2(a.getY(), a.getX());  //возвращает угол точки на окружности
         double angleB = Math.atan2(b.getY(), b.getX());
@@ -45,7 +45,7 @@ public class FigureBuilder {
         if (delta < 0) delta += 2.0 * Math.PI;
 
         double angle = angleA + delta * t;
-        double radius = Math.sqrt(a.getX() * a.getX() + a.getY() * a.getY());
+        double radius = Math.sqrt(a.getX() * a.getX() + a.getY() * a.getY());  //r = корень(x^2 + y^2)
 
         double x = radius * Math.cos(angle);
         double y = radius * Math.sin(angle);

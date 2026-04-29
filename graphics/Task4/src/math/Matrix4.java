@@ -106,7 +106,7 @@ public class Matrix4 {
 
         for (int row = 0; row < 4; row++) {
             for (int k = 0; k < 4; k++) {
-                r[row] += m[row][k] * v[k];
+                r[row] += m[row][k] * v[k];  //r[row] = m[row][0]*x + m[row][1]*y + m[row][2]*z + m[row][3]*1
             }
         }
         return new Point3D(r[0], r[1], r[2]);
